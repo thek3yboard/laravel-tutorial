@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+use App\Models\Chirp;
 
 /*
 |--------------------------------------------------------------------------
@@ -18,11 +19,20 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
-
 Route::middleware('auth')->group(function () {
+    Route::get('/chirps', function () {
+        return view('chirps.index');
+    })->name('chirps.index');
+
+    Route::post('/chirps', function() {
+        return Chirp::create([
+            'message' => request('message'),
+            'user_id' => auth()->id(),
+        ]);
+    });
+
+    Route::view('/dashboard', 'dashboard')->name('dashboard');
+
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
